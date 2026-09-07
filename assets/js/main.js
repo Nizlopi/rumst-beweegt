@@ -72,16 +72,38 @@ document.addEventListener('DOMContentLoaded', function () {
     onScroll();
   }
 
-  // Front-end only form handling (no backend wired up yet)
+  // Form handling — submits via FormSubmit (no backend of our own needed).
+  // data-placeholder-form holds the FormSubmit endpoint URL for that form.
   document.querySelectorAll('form[data-placeholder-form]').forEach(function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var endpoint = form.getAttribute('data-placeholder-form');
       var note = form.querySelector('.form-feedback');
-      if (note) {
-        note.textContent = 'Bedankt! Dit formulier is nog niet gekoppeld aan een verzendsysteem — dat volgt in de volgende stap van de website.';
-        note.style.display = 'block';
-      }
-      form.reset();
+      var btn = form.querySelector('button[type="submit"]');
+      // Honeypot: if a bot filled this hidden field, silently drop the submit.
+      var honey = form.querySelector('input[name="_honey"]');
+      if (honey && honey.value) return;
+
+      if (btn) btn.disabled = true;
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      }).then(function (res) {
+        if (!res.ok) throw new Error('request failed');
+        if (note) {
+          note.textContent = 'Bedankt! Je bericht is verstuurd — we nemen zo snel mogelijk contact met je op.';
+          note.style.display = 'block';
+        }
+        form.reset();
+      }).catch(function () {
+        if (note) {
+          note.textContent = 'Er ging iets mis bij het versturen. Probeer het later opnieuw, of mail ons rechtstreeks op info@rumstbeweegt.be.';
+          note.style.display = 'block';
+        }
+      }).finally(function () {
+        if (btn) btn.disabled = false;
+      });
     });
   });
 });
