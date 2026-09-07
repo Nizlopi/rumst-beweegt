@@ -383,9 +383,26 @@ body.nav-open .nav-toggle span::after{ transform: translateY(-6px) rotate(-45deg
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 56px;
-  align-items: center;
+  align-items: start;
 }
 @media (max-width: 860px){ .two-col{ grid-template-columns: 1fr; } }
+
+/* Content placeholder box sitting on a plain/light section background
+   (the default .hero-media styling assumes a dark hero background) */
+.hero-media.on-light{
+  aspect-ratio: 4/3;
+  background: var(--paper-alt);
+  border: 1.5px dashed rgba(34,26,23,.2);
+}
+.hero-media.on-light .placeholder-note{
+  color: var(--ink-soft);
+}
+.hero-media.on-light .placeholder-note strong{
+  color: var(--red);
+}
+@media (max-width: 640px){
+  .hero-media.on-light{ aspect-ratio: 3/2; }
+}
 
 .quote-block{
   background: var(--white);
